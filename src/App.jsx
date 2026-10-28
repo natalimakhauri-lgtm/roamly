@@ -551,7 +551,7 @@ function App() {
           {!countriesLoading && !countriesError && (
             <>
               <div className="country-grid">
-                {filteredCountries.slice(0, 12).map((country) => (
+                {filteredCountries.map((country) => (
                   <article
                     className="country-card"
                     key={country.cca3}
