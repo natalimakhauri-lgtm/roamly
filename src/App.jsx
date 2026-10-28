@@ -1,5 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
+import countriesData from 'world-countries';
 import './App.css';
 
 const experiences = [
@@ -349,43 +349,33 @@ function App() {
 
   const t = translations[language];
 
-  useEffect(() => {
-    let cancelled = false;
+ useEffect(() => {
+  try {
+    const countryList = Array.isArray(countriesData)
+      ? countriesData
+      : countriesData?.default || [];
 
-    async function loadCountries() {
-      try {
-        const response = await fetch(
-          "https://restcountries.com/v3.1/all?fields=name,flags,region,capital,cca3"
-        );
+    const data = countryList
+      .filter((country) => country.name?.common)
+      .map((country) => ({
+        ...country,
+        flags: {
+          ...country.flags,
+          svg: country.flags?.svg || country.flags?.png || '',
+        },
+      }))
+      .sort((a, b) =>
+        a.name.common.localeCompare(b.name.common)
+      );
 
-        if (!response.ok) {
-          throw new Error("Could not load countries");
-        }
-
-        const data = await response.json();
-
-        if (!cancelled) {
-          const sorted = data
-            .filter((country) => country.name?.common)
-            .sort((a, b) =>
-              a.name.common.localeCompare(b.name.common)
-            );
-          setCountries(sorted);
-        }
-      } catch (error) {
-        console.error("Country loading error:", error);
-        if (!cancelled) setCountriesError(true);
-      } finally {
-        if (!cancelled) setCountriesLoading(false);
-      }
-    }
-
-    loadCountries();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+    setCountries(data);
+  } catch (error) {
+    console.error('Country data error:', error);
+    setCountriesError(true);
+  } finally {
+    setCountriesLoading(false);
+  }
+}, []);
 
   const filteredCountries = countries.filter((country) =>
     country.name.common
