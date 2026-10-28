@@ -369,6 +369,7 @@ function App() {
       );
 
     setCountries(data);
+    console.log("Countries loaded:", data.length);
   } catch (error) {
     console.error('Country data error:', error);
     setCountriesError(true);
